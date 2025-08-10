@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Login - EduTest Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/yjp3aho.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: "sofia-pro", sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-green-100 min-h-screen">
+  <div id="navbar-container" data-source="components/navbar.html"></div>
+  
+  <main class="container mx-auto px-4 pt-24 pb-12">
+    <div class="max-w-md mx-auto">
+      <!-- Back Button -->
+      <div class="mb-6" data-id="back-button-container">
+        <a href="index.html" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors" data-id="back-button">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+          Back to Home
+        </a>
+      </div>
+      
+      <!-- Login Card -->
+      <div class="bg-white rounded-2xl shadow-xl p-8" data-id="login-card">
+        <div class="text-center mb-8" data-id="login-header">
+          <div class="mb-4" data-id="login-icon">
+            <i data-lucide="user-check" class="w-16 h-16 mx-auto text-indigo-600"></i>
+          </div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2" data-id="login-title">Teacher Login</h1>
+          <p class="text-gray-600" data-id="login-subtitle">Create custom tests, choose predefined subjects, and schedule exams</p>
+        </div>
+        
+        <div class="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+          <h3 class="font-medium text-blue-900 mb-2">Teacher Dashboard Features:</h3>
+          <ul class="text-sm text-blue-700 space-y-1">
+            <li>• Create custom tests with your own questions</li>
+            <li>• Choose from predefined subjects (OS, CO, DS, DBMS, Networks, OOPS)</li>
+            <li>• Schedule tests with specific date and time</li>
+            <li>• Tests become active only at scheduled time</li>
+          </ul>
+        </div>
+
+        <form id="teacherLoginForm" class="space-y-6" data-id="login-form">
+          <div data-id="email-field">
+            <label for="teacherEmail" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <div class="relative">
+              <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+              <input 
+                type="email" 
+                id="teacherEmail" 
+                name="email" 
+                required
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-colors"
+                placeholder="teacher@example.com"
+                data-id="email-input"
+              >
+            </div>
+          </div>
+          
+          <div data-id="password-field">
+            <label for="teacherPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <div class="relative">
+              <i data-lucide="lock" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+              <input 
+                type="password" 
+                id="teacherPassword" 
+                name="password" 
+                required
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-colors"
+                placeholder="Enter your password"
+                data-id="password-input"
+              >
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between" data-id="login-options">
+            <label class="flex items-center" data-id="remember-me">
+              <input type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+              <span class="ml-2 text-sm text-gray-600">Remember me</span>
+            </label>
+            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-700" data-id="forgot-password">
+              Forgot password?
+            </a>
+          </div>
+          
+          <button 
+            type="submit" 
+            class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors font-medium flex items-center justify-center"
+            data-id="login-button"
+          >
+            <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
+            Access Teacher Dashboard
+          </button>
+        </form>
+        
+        <div class="mt-6 text-center" data-id="signup-link">
+          <p class="text-gray-600">
+            Need access? 
+            <a href="teacher-register.html" class="text-indigo-600 hover:text-indigo-700 font-medium">Register here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container" data-source="components/footer.html"></div>
+
+  <script type="module">
+    import { loadComponent } from './scripts/components/loader.js';
+    
+    // Load shared components
+    loadComponent('#navbar-container');
+    loadComponent('#footer-container');
+    
+    // Initialize icons
+    setTimeout(() => {
+      lucide.createIcons();
+    }, 100);
+    
+    // Handle login form
+    document.getElementById('teacherLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('teacherEmail').value;
+      const password = document.getElementById('teacherPassword').value;
+      
+      // Mock authentication - replace with actual authentication logic
+      if (email && password) {
+        // Store user session
+        localStorage.setItem('teacherLoggedIn', 'true');
+        
+        // Redirect to teacher dashboard
+        window.location.href = 'teacher-dashboard.html';
+      } else {
+        alert('Please fill in all fields');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard - EduTest Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/yjp3aho.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: "sofia-pro", sans-serif; }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Dashboard Header -->
+  <header class="bg-white shadow-sm border-b" data-id="dashboard-header">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3" data-id="dashboard-logo">
+          <i data-lucide="graduation-cap" class="w-8 h-8 text-indigo-600"></i>
+          <span class="text-xl font-bold text-gray-900">EduTest Pro - Teacher</span>
+        </div>
+        <div class="flex items-center space-x-4" data-id="user-menu">
+          <span class="text-gray-600" data-id="user-welcome">Welcome, Teacher</span>
+          <button id="logout-btn" class="text-red-600 hover:text-red-700 font-medium" data-id="logout-button">
+            <i data-lucide="log-out" class="w-5 h-5 inline mr-1"></i>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Dashboard Stats -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8" data-id="dashboard-stats">
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-total-tests">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Total Tests</p>
+            <p class="text-3xl font-bold text-emerald-600" id="total-tests-count">12</p>
+          </div>
+          <i data-lucide="clipboard-list" class="w-12 h-12 text-emerald-500"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-active-tests">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Active Tests</p>
+            <p class="text-3xl font-bold text-blue-600" id="active-tests-count">3</p>
+          </div>
+          <i data-lucide="play-circle" class="w-12 h-12 text-blue-500"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-total-students">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Total Students</p>
+            <p class="text-3xl font-bold text-purple-600" id="total-students-count">156</p>
+          </div>
+          <i data-lucide="users" class="w-12 h-12 text-purple-500"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-avg-score">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Avg. Score</p>
+            <p class="text-3xl font-bold text-orange-600" id="avg-score">84%</p>
+          </div>
+          <i data-lucide="trending-up" class="w-12 h-12 text-orange-500"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Creation Options -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8" data-id="test-creation-options">
+      <!-- Custom Test Creation -->
+      <div class="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow" data-id="custom-test-card">
+        <div class="text-center mb-6">
+          <div class="bg-emerald-100 p-4 rounded-full inline-block mb-4">
+            <i data-lucide="edit-3" class="w-12 h-12 text-emerald-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Create Custom Test</h2>
+          <p class="text-gray-600">Design your own test with custom questions and options</p>
+        </div>
+        <button onclick="openCustomTestModal()" class="w-full bg-emerald-600 text-white py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors font-medium" data-id="create-custom-test-btn">
+          <i data-lucide="plus-circle" class="w-5 h-5 inline mr-2"></i>
+          Start Creating Custom Test
+        </button>
+      </div>
+
+      <!-- Predefined Test Creation -->
+      <div class="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow" data-id="predefined-test-card">
+        <div class="text-center mb-6">
+          <div class="bg-blue-100 p-4 rounded-full inline-block mb-4">
+            <i data-lucide="database" class="w-12 h-12 text-blue-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Create Predefined Test</h2>
+          <p class="text-gray-600">Choose from pre-built question banks and subjects</p>
+        </div>
+        <button onclick="openPredefinedTestModal()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium" data-id="create-predefined-test-btn">
+          <i data-lucide="folder-open" class="w-5 h-5 inline mr-2"></i>
+          Browse Predefined Tests
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Tests -->
+    <div class="bg-white rounded-xl p-6 shadow-sm" data-id="recent-tests">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Tests</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-3 text-gray-600 font-medium">Test Name</th>
+              <th class="text-left py-3 text-gray-600 font-medium">Type</th>
+              <th class="text-left py-3 text-gray-600 font-medium">Status</th>
+              <th class="text-left py-3 text-gray-600 font-medium">Scheduled</th>
+              <th class="text-left py-3 text-gray-600 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tests-table">
+            <!-- Tests will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Custom Test Creation Modal -->
+  <div id="customTestModal" class="modal" data-id="custom-test-modal">
+    <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900" data-id="modal-title">Create Custom Test</h2>
+        <button onclick="closeCustomTestModal()" class="text-gray-400 hover:text-gray-600" data-id="close-modal-btn">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Test Details Form -->
+      <form id="customTestForm" data-id="custom-test-form">
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Test Title</label>
+          <input type="text" id="testTitle" class="w-full border rounded-lg px-3 py-2" placeholder="Enter test title" required data-id="test-title-input">
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Test Duration (minutes)</label>
+            <input type="number" id="testDuration" class="w-full border rounded-lg px-3 py-2" placeholder="60" required data-id="test-duration-input">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Total Marks</label>
+            <input type="number" id="totalMarks" class="w-full border rounded-lg px-3 py-2" placeholder="100" required data-id="total-marks-input">
+          </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="mb-6" data-id="questions-section">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Questions</h3>
+            <button type="button" onclick="addQuestion()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm" data-id="add-question-btn">
+              <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>
+              Add Question
+            </button>
+          </div>
+          
+          <div id="questionsContainer" data-id="questions-container">
+            <!-- Questions will be added here dynamically -->
+          </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg" data-id="schedule-section">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Schedule Test</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Start Date & Time</label>
+              <input type="datetime-local" id="startDateTime" class="w-full border rounded-lg px-3 py-2" required data-id="start-datetime-input">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">End Date & Time</label>
+              <input type="datetime-local" id="endDateTime" class="w-full border rounded-lg px-3 py-2" required data-id="end-datetime-input">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+          <button type="button" onclick="closeCustomTestModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" data-id="cancel-btn">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700" data-id="save-test-btn">
+            Save Test
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Predefined Test Modal -->
+  <div id="predefinedTestModal" class="modal" data-id="predefined-test-modal">
+    <div class="bg-white rounded-xl p-8 max-w-3xl w-full mx-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900" data-id="predefined-modal-title">Select Predefined Test</h2>
+        <button onclick="closePredefinedTestModal()" class="text-gray-400 hover:text-gray-600" data-id="close-predefined-modal-btn">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-6" data-id="subject-selection">
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('os')" data-id="os-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="cpu" class="w-8 h-8 text-emerald-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Operating Systems</h3>
+              <p class="text-sm text-gray-600">Process management, memory, file systems</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('co')" data-id="co-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="circuit-board" class="w-8 h-8 text-blue-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Computer Organization</h3>
+              <p class="text-sm text-gray-600">Architecture, instruction sets, memory hierarchy</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('ds')" data-id="ds-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="database" class="w-8 h-8 text-purple-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Data Structures</h3>
+              <p class="text-sm text-gray-600">Arrays, trees, graphs, sorting algorithms</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('dbms')" data-id="dbms-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="server" class="w-8 h-8 text-orange-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Database Management</h3>
+              <p class="text-sm text-gray-600">SQL, normalization, transactions</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('networking')" data-id="networking-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="network" class="w-8 h-8 text-red-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Computer Networks</h3>
+              <p class="text-sm text-gray-600">OSI model, TCP/IP, routing protocols</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4 hover:border-emerald-500 cursor-pointer transition-colors" onclick="selectSubject('oops')" data-id="oops-subject">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="code" class="w-8 h-8 text-indigo-600"></i>
+            <div>
+              <h3 class="font-semibold text-gray-900">Object Oriented Programming</h3>
+              <p class="text-sm text-gray-600">Classes, inheritance, polymorphism</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Subject Details -->
+      <div id="subjectDetails" class="hidden mb-6 p-4 bg-blue-50 rounded-lg" data-id="subject-details">
+        <h3 class="font-semibold text-gray-900 mb-2">Test Configuration</h3>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Number of Questions</label>
+            <select id="questionCount" class="w-full border rounded px-3 py-1" data-id="question-count-select">
+              <option value="20">20 Questions</option>
+              <option value="30">30 Questions</option>
+              <option value="50">50 Questions</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty Level</label>
+            <select id="difficultyLevel" class="w-full border rounded px-3 py-1" data-id="difficulty-select">
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+            <select id="predefinedDuration" class="w-full border rounded px-3 py-1" data-id="predefined-duration-select">
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule for Predefined Test -->
+      <div id="predefinedSchedule" class="hidden mb-6 p-4 bg-gray-50 rounded-lg" data-id="predefined-schedule">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Schedule Test</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date & Time</label>
+            <input type="datetime-local" id="predefinedStartDateTime" class="w-full border rounded-lg px-3 py-2" required data-id="predefined-start-datetime">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">End Date & Time</label>
+            <input type="datetime-local" id="predefinedEndDateTime" class="w-full border rounded-lg px-3 py-2" required data-id="predefined-end-datetime">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <button onclick="closePredefinedTestModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" data-id="cancel-predefined-btn">
+          Cancel
+        </button>
+        <button onclick="createPredefinedTest()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" data-id="create-predefined-btn">
+          Create Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Initialize icons
+    lucide.createIcons();
+
+    let questionCount = 0;
+    let selectedSubject = null;
+
+    // Custom Test Functions
+    function openCustomTestModal() {
+      document.getElementById('customTestModal').classList.add('active');
+    }
+
+    function closeCustomTestModal() {
+      document.getElementById('customTestModal').classList.remove('active');
+      document.getElementById('customTestForm').reset();
+      document.getElementById('questionsContainer').innerHTML = '';
+      questionCount = 0;
+    }
+
+    function addQuestion() {
+      questionCount++;
+      const container = document.getElementById('questionsContainer');
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'border rounded-lg p-4 mb-4';
+      questionDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="font-semibold text-gray-900">Question ${questionCount}</h4>
+          <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-700">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+          <textarea class="w-full border rounded px-3 py-2" rows="2" placeholder="Enter your question here..." required></textarea>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Option A</label>
+            <input type="text" class="w-full border rounded px-3 py-1" placeholder="Option A" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Option B</label>
+            <input type="text" class="w-full border rounded px-3 py-1" placeholder="Option B" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Option C</label>
+            <input type="text" class="w-full border rounded px-3 py-1" placeholder="Option C" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Option D</label>
+            <input type="text" class="w-full border rounded px-3 py-1" placeholder="Option D" required>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
+          <select class="w-full border rounded px-3 py-1" required>
+            <option value="">Select correct answer</option>
+            <option value="A">Option A</option>
+            <option value="B">Option B</option>
+            <option value="C">Option C</option>
+            <option value="D">Option D</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Marks</label>
+          <input type="number" class="w-full border rounded px-3 py-1" placeholder="4" min="1" required>
+        </div>
+      `;
+      container.appendChild(questionDiv);
+      lucide.createIcons();
+    }
+
+    function removeQuestion(button) {
+      button.closest('.border').remove();
+      updateQuestionNumbers();
+    }
+
+    function updateQuestionNumbers() {
+      const questions = document.querySelectorAll('#questionsContainer .border h4');
+      questions.forEach((question, index) => {
+        question.textContent = `Question ${index + 1}`;
+      });
+      questionCount = questions.length;
+    }
+
+    // Predefined Test Functions
+    function openPredefinedTestModal() {
+      document.getElementById('predefinedTestModal').classList.add('active');
+    }
+
+    function closePredefinedTestModal() {
+      document.getElementById('predefinedTestModal').classList.remove('active');
+      selectedSubject = null;
+      document.getElementById('subjectDetails').classList.add('hidden');
+      document.getElementById('predefinedSchedule').classList.add('hidden');
+    }
+
+    function selectSubject(subject) {
+      selectedSubject = subject;
+      document.getElementById('subjectDetails').classList.remove('hidden');
+      document.getElementById('predefinedSchedule').classList.remove('hidden');
+      
+      // Remove previous selection styles
+      document.querySelectorAll('[data-id$="-subject"]').forEach(el => {
+        el.classList.remove('border-emerald-500', 'bg-emerald-50');
+      });
+      
+      // Add selection style to current subject
+      document.querySelector(`[data-id="${subject}-subject"]`).classList.add('border-emerald-500', 'bg-emerald-50');
+    }
+
+    // Form Submissions
+    document.getElementById('customTestForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const testData = {
+        title: document.getElementById('testTitle').value,
+        duration: document.getElementById('testDuration').value,
+        totalMarks: document.getElementById('totalMarks').value,
+        startDateTime: document.getElementById('startDateTime').value,
+        endDateTime: document.getElementById('endDateTime').value,
+        type: 'custom',
+        questions: getCustomQuestions()
+      };
+      
+      saveTest(testData);
+      closeCustomTestModal();
+    });
+
+    function createPredefinedTest() {
+      if (!selectedSubject) {
+        alert('Please select a subject');
+        return;
+      }
+      
+      const testData = {
+        subject: selectedSubject,
+        questionCount: document.getElementById('questionCount').value,
+        difficulty: document.getElementById('difficultyLevel').value,
+        duration: document.getElementById('predefinedDuration').value,
+        startDateTime: document.getElementById('predefinedStartDateTime').value,
+        endDateTime: document.getElementById('predefinedEndDateTime').value,
+        type: 'predefined'
+      };
+      
+      saveTest(testData);
+      closePredefinedTestModal();
+    }
+
+    function getCustomQuestions() {
+      const questions = [];
+      const questionDivs = document.querySelectorAll('#questionsContainer .border');
+      
+      questionDivs.forEach((div, index) => {
+        const inputs = div.querySelectorAll('input, textarea, select');
+        questions.push({
+          id: index + 1,
+          text: inputs[0].value,
+          options: {
+            A: inputs[1].value,
+            B: inputs[2].value,
+            C: inputs[3].value,
+            D: inputs[4].value
+          },
+          correctAnswer: inputs[5].value,
+          marks: parseInt(inputs[6].value)
+        });
+      });
+      
+      return questions;
+    }
+
+    function saveTest(testData) {
+      // Get existing tests from localStorage
+      let tests = JSON.parse(localStorage.getItem('teacherTests') || '[]');
+      
+      // Add new test with unique ID and timestamp
+      testData.id = Date.now().toString();
+      testData.createdAt = new Date().toISOString();
+      testData.status = 'scheduled';
+      
+      tests.push(testData);
+      localStorage.setItem('teacherTests', JSON.stringify(tests));
+      
+      alert('Test created and scheduled successfully!');
+      loadRecentTests();
+    }
+
+    function loadRecentTests() {
+      const tests = JSON.parse(localStorage.getItem('teacherTests') || '[]');
+      const tbody = document.getElementById('tests-table');
+      
+      tbody.innerHTML = tests.slice(-5).reverse().map(test => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-3">${test.title || `${test.subject?.toUpperCase()} Test`}</td>
+          <td class="py-3">
+            <span class="inline-block px-2 py-1 rounded text-xs ${test.type === 'custom' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
+              ${test.type === 'custom' ? 'Custom' : 'Predefined'}
+            </span>
+          </td>
+          <td class="py-3">
+            <span class="inline-block px-2 py-1 rounded text-xs ${getStatusColor(test)}">
+              ${getTestStatus(test)}
+            </span>
+          </td>
+          <td class="py-3">${formatDateTime(test.startDateTime)}</td>
+          <td class="py-3">
+            <button onclick="viewTest('${test.id}')" class="text-indigo-600 hover:text-indigo-700 mr-2">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+            <button onclick="deleteTest('${test.id}')" class="text-red-600 hover:text-red-700">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      
+      lucide.createIcons();
+    }
+
+    function getTestStatus(test) {
+      const now = new Date();
+      const start = new Date(test.startDateTime);
+      const end = new Date(test.endDateTime);
+      
+      if (now < start) return 'Scheduled';
+      if (now >= start && now <= end) return 'Active';
+      return 'Completed';
+    }
+
+    function getStatusColor(test) {
+      const status = getTestStatus(test);
+      switch(status) {
+        case 'Scheduled': return 'bg-yellow-100 text-yellow-800';
+        case 'Active': return 'bg-green-100 text-green-800';
+        case 'Completed': return 'bg-gray-100 text-gray-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    function formatDateTime(dateTime) {
+      return new Date(dateTime).toLocaleString();
+    }
+
+    function viewTest(testId) {
+      // Implementation for viewing test details
+      alert('View test functionality - ID: ' + testId);
+    }
+
+    function deleteTest(testId) {
+      if (confirm('Are you sure you want to delete this test?')) {
+        let tests = JSON.parse(localStorage.getItem('teacherTests') || '[]');
+        tests = tests.filter(test => test.id !== testId);
+        localStorage.setItem('teacherTests', JSON.stringify(tests));
+        loadRecentTests();
+      }
+    }
+
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('teacherLoggedIn');
+        window.location.href = 'teacher-login.html';
+      }
+    });
+
+    // Make functions global
+    window.openCustomTestModal = openCustomTestModal;
+    window.closeCustomTestModal = closeCustomTestModal;
+    window.addQuestion = addQuestion;
+    window.removeQuestion = removeQuestion;
+    window.openPredefinedTestModal = openPredefinedTestModal;
+    window.closePredefinedTestModal = closePredefinedTestModal;
+    window.selectSubject = selectSubject;
+    window.createPredefinedTest = createPredefinedTest;
+    window.viewTest = viewTest;
+    window.deleteTest = deleteTest;
+
+    // Load initial data
+    loadRecentTests();
+  </script>
+</body>
+</html>

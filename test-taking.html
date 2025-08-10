@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test in Progress - EduTest Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/yjp3aho.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { 
+      font-family: "sofia-pro", sans-serif; 
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    
+    /* Disable text selection */
+    .no-select {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    /* Hide scrollbars in fullscreen */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Violation alert */
+    .violation-alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      animation: slideInRight 0.3s ease-out;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen no-select">
+  <!-- Test Header -->
+  <header class="bg-white shadow-sm border-b sticky top-0 z-50" data-id="test-header">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4" data-id="test-info">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield-check" class="w-6 h-6 text-green-500"></i>
+            <span class="text-sm font-medium text-green-600">Monitoring Active</span>
+          </div>
+          <div class="h-6 border-l border-gray-300"></div>
+          <h1 class="text-lg font-semibold text-gray-900" id="test-title" data-id="test-title">Mathematics Final Exam</h1>
+        </div>
+        
+        <div class="flex items-center space-x-6" data-id="test-status">
+          <!-- Timer -->
+          <div class="flex items-center space-x-2" data-id="timer-display">
+            <i data-lucide="clock" class="w-5 h-5 text-blue-500"></i>
+            <span class="text-lg font-mono font-bold text-blue-600" id="timer">02:00:00</span>
+          </div>
+          
+          <!-- Question Counter -->
+          <div class="flex items-center space-x-2" data-id="question-counter">
+            <i data-lucide="help-circle" class="w-5 h-5 text-purple-500"></i>
+            <span class="text-sm font-medium text-gray-700" id="question-progress">1 of 50</span>
+          </div>
+          
+          <!-- Submit Button -->
+          <button 
+            id="submit-test-btn" 
+            class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+            data-id="submit-test-btn"
+          >
+            Submit Test
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Test Area -->
+  <main class="container mx-auto px-4 py-6">
+    <!-- Question Card -->
+    <div class="bg-white rounded-xl shadow-sm p-8 mb-6" data-id="question-card">
+      <div class="mb-6" data-id="question-header">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-gray-900" data-id="question-number">
+            Question <span id="current-question-num">1</span>
+          </h2>
+          <div class="flex items-center space-x-2" data-id="question-type">
+            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">Multiple Choice</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Question Content -->
+      <div class="mb-8" data-id="question-content">
+        <p class="text-lg text-gray-900 leading-relaxed" id="question-text" data-id="question-text">
+          What is the derivative of f(x) = 3x² + 2x + 1?
+        </p>
+      </div>
+      
+      <!-- Answer Options -->
+      <div class="space-y-4" id="answer-options" data-id="answer-options">
+        <!-- Options will be dynamically populated -->
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="flex items-center justify-between bg-white rounded-xl shadow-sm p-6" data-id="test-navigation">
+      <button 
+        id="prev-question-btn" 
+        class="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
+        data-id="prev-question-btn"
+        disabled
+      >
+        <i data-lucide="chevron-left" class="w-5 h-5 mr-2"></i>
+        Previous
+      </button>
+      
+      <!-- Question Grid -->
+      <div class="flex items-center space-x-2" data-id="question-grid">
+        <span class="text-sm text-gray-600 mr-2">Jump to:</span>
+        <div class="flex flex-wrap gap-2" id="question-grid" data-id="question-numbers">
+          <!-- Question numbers will be populated -->
+        </div>
+      </div>
+      
+      <button 
+        id="next-question-btn" 
+        class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        data-id="next-question-btn"
+      >
+        Next
+        <i data-lucide="chevron-right" class="w-5 h-5 ml-2"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- Violation Alert Template -->
+  <div id="violation-alert-template" class="hidden">
+    <div class="violation-alert bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg">
+      <div class="flex items-center">
+        <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i>
+        <span class="font-medium">Security Alert:</span>
+        <span class="ml-2" id="violation-message"></span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { TestMonitor } from './scripts/utils/test-monitor.js';
+
+    // Check authentication and test data
+    if (!localStorage.getItem('isLoggedIn') || !localStorage.getItem('currentTest')) {
+      window.location.href = 'student-dashboard.html';
+    }
+
+    const testData = JSON.parse(localStorage.getItem('currentTest'));
+    let currentQuestionIndex = 0;
+    let answers = {};
+    let timeRemaining = 120 * 60; // 2 hours in seconds
+    let timerInterval;
+    
+    // Sample questions - replace with actual test data
+    const questions = [
+      {
+        id: 1,
+        text: "What is the derivative of f(x) = 3x² + 2x + 1?",
+        type: "multiple-choice",
+        options: [
+          "6x + 2",
+          "3x + 2",
+          "6x² + 2x",
+          "9x + 2"
+        ],
+        correctAnswer: 0
+      },
+      {
+        id: 2,
+        text: "If log₂(8) = x, what is the value of x?",
+        type: "multiple-choice",
+        options: [
+          "2",
+          "3",
+          "4",
+          "8"
+        ],
+        correctAnswer: 1
+      },
+      // Add more questions as needed
+    ];
+
+    // Initialize test monitor
+    const testMonitor = new TestMonitor({
+      onViolation: (violation, allViolations) => {
+        showViolationAlert(violation);
+        
+        // Log violation for review
+        console.warn('Test violation recorded:', violation);
+      },
+      onCameraError: (error) => {
+        console.error('Camera monitoring unavailable:', error);
+        alert('Camera monitoring is required for this test. Please allow camera access and refresh the page.');
+      }
+    });
+
+    // Initialize test
+    async function initializeTest() {
+      // Update test title
+      document.getElementById('test-title').textContent = testData.title;
+      
+      // Setup test monitor
+      const monitorInitialized = await testMonitor.initialize();
+      if (!monitorInitialized) {
+        alert('Failed to initialize security monitoring. The test cannot proceed.');
+        return;
+      }
+      
+      // Start monitoring
+      testMonitor.startMonitoring();
+      
+      // Populate questions
+      populateQuestionGrid();
+      displayQuestion(0);
+      
+      // Start timer
+      startTimer();
+      
+      // Setup event listeners
+      setupEventListeners();
+    }
+
+    function populateQuestionGrid() {
+      const grid = document.getElementById('question-grid');
+      grid.innerHTML = '';
+      
+      for (let i = 0; i < questions.length; i++) {
+        const button = document.createElement('button');
+        button.className = 'w-8 h-8 text-xs rounded border border-gray-300 hover:bg-gray-100 transition-colors';
+        button.textContent = i + 1;
+        button.onclick = () => displayQuestion(i);
+        button.setAttribute('data-runtime', 'true');
+        grid.appendChild(button);
+      }
+      
+      updateQuestionGrid();
+    }
+
+    function displayQuestion(index) {
+      if (index < 0 || index >= questions.length) return;
+      
+      currentQuestionIndex = index;
+      const question = questions[index];
+      
+      // Update question content
+      document.getElementById('current-question-num').textContent = index + 1;
+      document.getElementById('question-text').textContent = question.text;
+      document.getElementById('question-progress').textContent = `${index + 1} of ${questions.length}`;
+      
+      // Update answer options
+      const optionsContainer = document.getElementById('answer-options');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach((option, optionIndex) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors';
+        optionDiv.setAttribute('data-runtime', 'true');
+        
+        const isSelected = answers[question.id] === optionIndex;
+        if (isSelected) {
+          optionDiv.classList.add('bg-blue-50', 'border-blue-300');
+        }
+        
+        optionDiv.innerHTML = `
+          <input 
+            type="radio" 
+            name="question-${question.id}" 
+            value="${optionIndex}"
+            class="text-blue-600 focus:ring-blue-500"
+            ${isSelected ? 'checked' : ''}
+          >
+          <label class="flex-1 cursor-pointer font-medium text-gray-900">
+            ${String.fromCharCode(65 + optionIndex)}. ${option}
+          </label>
+        `;
+        
+        optionDiv.addEventListener('click', () => selectAnswer(question.id, optionIndex));
+        optionsContainer.appendChild(optionDiv);
+      });
+      
+      // Update navigation buttons
+      document.getElementById('prev-question-btn').disabled = index === 0;
+      document.getElementById('next-question-btn').textContent = 
+        index === questions.length - 1 ? 'Finish' : 'Next';
+      
+      updateQuestionGrid();
+    }
+
+    function selectAnswer(questionId, answerIndex) {
+      answers[questionId] = answerIndex;
+      displayQuestion(currentQuestionIndex); // Refresh to show selection
+    }
+
+    function updateQuestionGrid() {
+      const buttons = document.querySelectorAll('#question-grid button');
+      buttons.forEach((button, index) => {
+        const questionId = questions[index].id;
+        const isAnswered = answers.hasOwnProperty(questionId);
+        const isCurrent = index === currentQuestionIndex;
+        
+        button.className = `w-8 h-8 text-xs rounded transition-colors ${
+          isCurrent 
+            ? 'bg-blue-600 text-white' 
+            : isAnswered 
+            ? 'bg-green-100 text-green-800 border border-green-300' 
+            : 'border border-gray-300 hover:bg-gray-100'
+        }`;
+      });
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        
+        if (timeRemaining <= 0) {
+          autoSubmitTest('Time expired');
+          return;
+        }
+        
+        const hours = Math.floor(timeRemaining / 3600);
+        const minutes = Math.floor((timeRemaining % 3600) / 60);
+        const seconds = timeRemaining % 60;
+        
+        const timerDisplay = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('timer').textContent = timerDisplay;
+        
+        // Change color when time is running low
+        const timerElement = document.getElementById('timer');
+        if (timeRemaining <= 300) { // Last 5 minutes
+          timerElement.className = 'text-lg font-mono font-bold text-red-600';
+        } else if (timeRemaining <= 600) { // Last 10 minutes
+          timerElement.className = 'text-lg font-mono font-bold text-orange-600';
+        }
+      }, 1000);
+    }
+
+    function setupEventListeners() {
+      // Navigation buttons
+      document.getElementById('prev-question-btn').addEventListener('click', () => {
+        displayQuestion(currentQuestionIndex - 1);
+      });
+      
+      document.getElementById('next-question-btn').addEventListener('click', () => {
+        if (currentQuestionIndex === questions.length - 1) {
+          if (confirm('Are you sure you want to submit the test?')) {
+            submitTest();
+          }
+        } else {
+          displayQuestion(currentQuestionIndex + 1);
+        }
+      });
+      
+      // Submit button
+      document.getElementById('submit-test-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to submit the test? This action cannot be undone.')) {
+          submitTest();
+        }
+      });
+      
+      // Auto-submit event listener
+      document.addEventListener('testAutoSubmit', (event) => {
+        autoSubmitTest(event.detail.reason);
+      });
+      
+      // Prevent page unload
+      window.addEventListener('beforeunload', (event) => {
+        if (testMonitor.isActive) {
+          event.preventDefault();
+          event.returnValue = 'Test in progress. Are you sure you want to leave?';
+        }
+      });
+    }
+
+    function showViolationAlert(violation) {
+      const template = document.getElementById('violation-alert-template');
+      const alert = template.cloneNode(true);
+      alert.id = '';
+      alert.classList.remove('hidden');
+      alert.setAttribute('data-runtime', 'true');
+      
+      const messageElement = alert.querySelector('#violation-message');
+      messageElement.textContent = violation.type;
+      
+      document.body.appendChild(alert);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.remove();
+        }
+      }, 5000);
+      
+      lucide.createIcons();
+    }
+
+    function submitTest() {
+      finishTest('Manual submission');
+    }
+
+    function autoSubmitTest(reason) {
+      finishTest(`Auto-submission: ${reason}`);
+    }
+
+    function finishTest(submissionType) {
+      // Stop monitoring
+      testMonitor.stopMonitoring();
+      
+      // Clear timer
+      clearInterval(timerInterval);
+      
+      // Calculate results
+      const results = calculateResults();
+      const violationSummary = testMonitor.getViolationSummary();
+      
+      // Store results
+      const testResult = {
+        testId: testData.id,
+        testTitle: testData.title,
+        answers,
+        results,
+        submissionType,
+        violations: violationSummary,
+        timeSpent: (120 * 60) - timeRemaining,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem('lastTestResult', JSON.stringify(testResult));
+      
+      // Redirect to results page
+      window.location.href = 'test-result.html';
+    }
+
+    function calculateResults() {
+      let correct = 0;
+      let attempted = 0;
+      
+      questions.forEach(question => {
+        if (answers.hasOwnProperty(question.id)) {
+          attempted++;
+          if (answers[question.id] === question.correctAnswer) {
+            correct++;
+          }
+        }
+      });
+      
+      return {
+        totalQuestions: questions.length,
+        attempted,
+        correct,
+        incorrect: attempted - correct,
+        unanswered: questions.length - attempted,
+        percentage: attempted > 0 ? Math.round((correct / questions.length) * 100) : 0
+      };
+    }
+
+    // Initialize everything
+    initializeTest();
+    lucide.createIcons();
+  </script>
+</body>
+</html>

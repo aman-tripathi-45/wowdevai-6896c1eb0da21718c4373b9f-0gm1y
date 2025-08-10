@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - EduTest Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/yjp3aho.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: "sofia-pro", sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Dashboard Header -->
+  <header class="bg-white shadow-sm border-b" data-id="dashboard-header">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3" data-id="dashboard-logo">
+          <i data-lucide="graduation-cap" class="w-8 h-8 text-indigo-600"></i>
+          <span class="text-xl font-bold text-gray-900">EduTest Pro</span>
+        </div>
+        <div class="flex items-center space-x-4" data-id="user-menu">
+          <span class="text-gray-600" data-id="user-welcome">Welcome, Student</span>
+          <button id="logout-btn" class="text-red-600 hover:text-red-700 font-medium" data-id="logout-button">
+            <i data-lucide="log-out" class="w-5 h-5 inline mr-1"></i>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Dashboard Stats -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8" data-id="dashboard-stats">
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-available-tests">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Available Tests</p>
+            <p class="text-3xl font-bold text-blue-600" id="available-tests-count">2</p>
+          </div>
+          <i data-lucide="clipboard-list" class="w-12 h-12 text-blue-500"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-completed-tests">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Completed Tests</p>
+            <p class="text-3xl font-bold text-green-600" id="completed-tests-count">5</p>
+          </div>
+          <i data-lucide="check-circle" class="w-12 h-12 text-green-500"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="stat-average-score">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Average Score</p>
+            <p class="text-3xl font-bold text-purple-600" id="average-score">87%</p>
+          </div>
+          <i data-lucide="trending-up" class="w-12 h-12 text-purple-500"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Tests -->
+    <section class="mb-8" data-id="available-tests-section">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6" data-id="available-tests-title">
+        Available Tests
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-6" id="available-tests-container" data-id="available-tests-container">
+        <!-- Test cards will be dynamically populated -->
+      </div>
+    </section>
+
+    <!-- Recent Results -->
+    <section data-id="recent-results-section">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6" data-id="recent-results-title">
+        Recent Results
+      </h2>
+      
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden" data-id="results-table">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="results-table-body" data-id="results-table-body">
+              <!-- Results will be dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { TestMonitor } from './scripts/utils/test-monitor.js';
+    
+    // Check authentication
+    if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userType') !== 'student') {
+      window.location.href = 'student-login.html';
+    }
+
+    // Sample data - replace with actual API calls
+    const availableTests = [
+      {
+        id: 1,
+        title: "Mathematics Final Exam",
+        subject: "Mathematics",
+        duration: "2 hours",
+        questions: 50,
+        scheduledTime: "2024-01-15T10:00:00",
+        status: "active"
+      },
+      {
+        id: 2,
+        title: "Physics Quiz",
+        subject: "Physics",
+        duration: "1 hour",
+        questions: 25,
+        scheduledTime: "2024-01-16T14:00:00",
+        status: "scheduled"
+      }
+    ];
+
+    const recentResults = [
+      {
+        testName: "Chemistry Midterm",
+        date: "2024-01-10",
+        score: 92,
+        status: "Completed"
+      },
+      {
+        testName: "Biology Quiz",
+        date: "2024-01-08",
+        score: 85,
+        status: "Completed"
+      },
+      {
+        testName: "English Literature",
+        date: "2024-01-05",
+        score: 78,
+        status: "Completed"
+      }
+    ];
+
+    // Populate available tests
+    function populateAvailableTests() {
+      const container = document.getElementById('available-tests-container');
+      container.innerHTML = '';
+
+      availableTests.forEach(test => {
+        const currentTime = new Date();
+        const scheduledTime = new Date(test.scheduledTime);
+        const isActive = scheduledTime <= currentTime;
+        
+        const testCard = document.createElement('div');
+        testCard.className = 'bg-white rounded-xl p-6 shadow-sm border';
+        testCard.setAttribute('data-runtime', 'true');
+        
+        testCard.innerHTML = `
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-1">${test.title}</h3>
+              <p class="text-sm text-gray-600">${test.subject}</p>
+            </div>
+            <span class="px-2 py-1 text-xs rounded-full ${isActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+              ${isActive ? 'Active' : 'Scheduled'}
+            </span>
+          </div>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center text-sm text-gray-600">
+              <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+              Duration: ${test.duration}
+            </div>
+            <div class="flex items-center text-sm text-gray-600">
+              <i data-lucide="help-circle" class="w-4 h-4 mr-2"></i>
+              Questions: ${test.questions}
+            </div>
+            <div class="flex items-center text-sm text-gray-600">
+              <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+              ${scheduledTime.toLocaleString()}
+            </div>
+          </div>
+          
+          <button 
+            class="w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+              isActive 
+                ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+            }"
+            ${isActive ? '' : 'disabled'}
+            onclick="${isActive ? `startTest(${test.id})` : ''}"
+          >
+            ${isActive ? 'Start Test' : 'Not Available Yet'}
+          </button>
+        `;
+        
+        container.appendChild(testCard);
+      });
+      
+      lucide.createIcons();
+    }
+
+    // Populate recent results
+    function populateRecentResults() {
+      const tbody = document.getElementById('results-table-body');
+      tbody.innerHTML = '';
+
+      recentResults.forEach(result => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-runtime', 'true');
+        
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${result.testName}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${result.date}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${result.score}%</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+              ${result.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <button class="text-blue-600 hover:text-blue-700" onclick="viewResult('${result.testName}')">
+              View Details
+            </button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+
+    // Start test function
+    window.startTest = function(testId) {
+      const test = availableTests.find(t => t.id === testId);
+      if (test) {
+        // Store test info and redirect to test page
+        localStorage.setItem('currentTest', JSON.stringify(test));
+        window.location.href = 'test-taking.html';
+      }
+    };
+
+    // View result function
+    window.viewResult = function(testName) {
+      // Store result info and redirect to result page
+      localStorage.setItem('viewingResult', testName);
+      window.location.href = 'test-result.html';
+    };
+
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    // Initialize dashboard
+    populateAvailableTests();
+    populateRecentResults();
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Analytics - EduTest Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://use.typekit.net/yjp3aho.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: "sofia-pro", sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b" data-id="analytics-header">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3" data-id="header-logo">
+          <i data-lucide="bar-chart-3" class="w-8 h-8 text-indigo-600"></i>
+          <span class="text-xl font-bold text-gray-900">Test Analytics</span>
+        </div>
+        <div class="flex items-center space-x-4" data-id="header-actions">
+          <button onclick="window.location.href='teacher-dashboard.html'" class="text-indigo-600 hover:text-indigo-700 font-medium" data-id="back-to-dashboard">
+            <i data-lucide="arrow-left" class="w-5 h-5 inline mr-1"></i>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Test Selection -->
+    <div class="bg-white rounded-xl p-6 shadow-sm mb-8" data-id="test-selection">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Select Test for Analytics</h2>
+      <select id="testSelect" class="w-full md:w-96 border rounded-lg px-3 py-2" data-id="test-select-dropdown">
+        <option value="">Choose a test...</option>
+      </select>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div id="analyticsContent" class="hidden" data-id="analytics-content">
+      <!-- Performance Overview -->
+      <div class="grid md:grid-cols-4 gap-6 mb-8" data-id="performance-stats">
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Total Students</p>
+              <p class="text-3xl font-bold text-blue-600" id="totalStudents">--</p>
+            </div>
+            <i data-lucide="users" class="w-12 h-12 text-blue-500"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Average Score</p>
+              <p class="text-3xl font-bold text-emerald-600" id="averageScore">--%</p>
+            </div>
+            <i data-lucide="trending-up" class="w-12 h-12 text-emerald-500"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Highest Score</p>
+              <p class="text-3xl font-bold text-purple-600" id="highestScore">--%</p>
+            </div>
+            <i data-lucide="award" class="w-12 h-12 text-purple-500"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Pass Rate</p>
+              <p class="text-3xl font-bold text-orange-600" id="passRate">--%</p>
+            </div>
+            <i data-lucide="check-circle" class="w-12 h-12 text-orange-500"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid md:grid-cols-2 gap-8 mb-8" data-id="charts-section">
+        <!-- Score Distribution Chart -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Score Distribution</h3>
+          <canvas id="scoreDistributionChart" width="400" height="300"></canvas>
+        </div>
+
+        <!-- Performance Comparison Chart -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Performance Comparison</h3>
+          <canvas id="performanceComparisonChart" width="400" height="300"></canvas>
+        </div>
+      </div>
+
+      <!-- Student Results Table -->
+      <div class="bg-white rounded-xl p-6 shadow-sm" data-id="results-table">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Individual Student Results</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-3 text-gray-600 font-medium">Student Name</th>
+                <th class="text-left py-3 text-gray-600 font-medium">Score</th>
+                <th class="text-left py-3 text-gray-600 font-medium">Percentage</th>
+                <th class="text-left py-3 text-gray-600 font-medium">Grade</th>
+                <th class="text-left py-3 text-gray-600 font-medium">Time Taken</th>
+                <th class="text-left py-3 text-gray-600 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTableBody">
+              <!-- Results will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    lucide.createIcons();
+
+    // Sample data for demonstration
+    const sampleTestResults = [
+      { id: '1', name: 'Alice Johnson', score: 85, totalMarks: 100, timeTaken: '45 min', status: 'completed' },
+      { id: '2', name: 'Bob Smith', score: 92, totalMarks: 100, timeTaken: '38 min', status: 'completed' },
+      { id: '3', name: 'Carol Davis', score: 78, totalMarks: 100, timeTaken: '55 min', status: 'completed' },
+      { id: '4', name: 'David Wilson', score: 68, totalMarks: 100, timeTaken: '60 min', status: 'completed' },
+      { id: '5', name: 'Eva Brown', score: 95, totalMarks: 100, timeTaken: '42 min', status: 'completed' },
+      { id: '6', name: 'Frank Miller', score: 73, totalMarks: 100, timeTaken: '52 min', status: 'completed' },
+      { id: '7', name: 'Grace Taylor', score: 88, totalMarks: 100, timeTaken: '47 min', status: 'completed' },
+      { id: '8', name: 'Henry Lee', score: 81, totalMarks: 100, timeTaken: '49 min', status: 'completed' }
+    ];
+
+    function loadTests() {
+      const tests = JSON.parse(localStorage.getItem('teacherTests') || '[]');
+      const select = document.getElementById('testSelect');
+      
+      // Add sample tests if none exist
+      if (tests.length === 0) {
+        const sampleTests = [
+          { id: 'sample-1', title: 'Operating Systems Mid-term', type: 'predefined', subject: 'os' },
+          { id: 'sample-2', title: 'Data Structures Quiz', type: 'custom' },
+          { id: 'sample-3', title: 'Computer Networks Final', type: 'predefined', subject: 'networking' }
+        ];
+        
+        sampleTests.forEach(test => {
+          const option = document.createElement('option');
+          option.value = test.id;
+          option.textContent = test.title;
+          select.appendChild(option);
+        });
+      } else {
+        tests.forEach(test => {
+          const option = document.createElement('option');
+          option.value = test.id;
+          option.textContent = test.title || `${test.subject?.toUpperCase()} Test`;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    function showAnalytics(testId) {
+      if (!testId) {
+        document.getElementById('analyticsContent').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('analyticsContent').classList.remove('hidden');
+      
+      // Calculate statistics
+      const totalStudents = sampleTestResults.length;
+      const averageScore = Math.round(sampleTestResults.reduce((sum, result) => sum + result.score, 0) / totalStudents);
+      const highestScore = Math.max(...sampleTestResults.map(result => result.score));
+      const passRate = Math.round((sampleTestResults.filter(result => result.score >= 60).length / totalStudents) * 100);
+
+      // Update statistics
+      document.getElementById('totalStudents').textContent = totalStudents;
+      document.getElementById('averageScore').textContent = `${averageScore}%`;
+      document.getElementById('highestScore').textContent = `${highestScore}%`;
+      document.getElementById('passRate').textContent = `${passRate}%`;
+
+      // Load charts and table
+      createScoreDistributionChart();
+      createPerformanceComparisonChart();
+      loadResultsTable();
+    }
+
+    function createScoreDistributionChart() {
+      const ctx = document.getElementById('scoreDistributionChart').getContext('2d');
+      
+      // Group scores into ranges
+      const ranges = ['0-40', '41-60', '61-80', '81-100'];
+      const data = [
+        sampleTestResults.filter(r => r.score <= 40).length,
+        sampleTestResults.filter(r => r.score > 40 && r.score <= 60).length,
+        sampleTestResults.filter(r => r.score > 60 && r.score <= 80).length,
+        sampleTestResults.filter(r => r.score > 80).length
+      ];
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ranges,
+          datasets: [{
+            label: 'Number of Students',
+            data: data,
+            backgroundColor: [
+              'rgba(239, 68, 68, 0.8)',   // Red for 0-40
+              'rgba(245, 158, 11, 0.8)',  // Orange for 41-60
+              'rgba(59, 130, 246, 0.8)',  // Blue for 61-80
+              'rgba(34, 197, 94, 0.8)'    // Green for 81-100
+            ],
+            borderColor: [
+              'rgb(239, 68, 68)',
+              'rgb(245, 158, 11)',
+              'rgb(59, 130, 246)',
+              'rgb(34, 197, 94)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function createPerformanceComparisonChart() {
+      const ctx = document.getElementById('performanceComparisonChart').getContext('2d');
+      
+      const scores = sampleTestResults.map(r => r.score).sort((a, b) => b - a);
+      const names = sampleTestResults
+        .sort((a, b) => b.score - a.score)
+        .map(r => r.name.split(' ')[0]); // First name only
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: names,
+          datasets: [{
+            label: 'Student Scores',
+            data: scores,
+            borderColor: 'rgb(99, 102, 241)',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100
+            }
+          }
+        }
+      });
+    }
+
+    function loadResultsTable() {
+      const tbody = document.getElementById('resultsTableBody');
+      
+      tbody.innerHTML = sampleTestResults
+        .sort((a, b) => b.score - a.score)
+        .map(result => {
+          const percentage = Math.round((result.score / result.totalMarks) * 100);
+          const grade = getGrade(percentage);
+          
+          return `
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3">${result.name}</td>
+              <td class="py-3">${result.score}/${result.totalMarks}</td>
+              <td class="py-3">${percentage}%</td>
+              <td class="py-3">
+                <span class="inline-block px-2 py-1 rounded text-xs font-medium ${getGradeColor(grade)}">
+                  ${grade}
+                </span>
+              </td>
+              <td class="py-3">${result.timeTaken}</td>
+              <td class="py-3">
+                <span class="inline-block px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                  ${result.status}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+    }
+
+    function getGrade(percentage) {
+      if (percentage >= 90) return 'A+';
+      if (percentage >= 80) return 'A';
+      if (percentage >= 70) return 'B';
+      if (percentage >= 60) return 'C';
+      if (percentage >= 50) return 'D';
+      return 'F';
+    }
+
+    function getGradeColor(grade) {
+      switch(grade) {
+        case 'A+':
+        case 'A': return 'bg-green-100 text-green-800';
+        case 'B': return 'bg-blue-100 text-blue-800';
+        case 'C': return 'bg-yellow-100 text-yellow-800';
+        case 'D': return 'bg-orange-100 text-orange-800';
+        case 'F': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    // Event listeners
+    document.getElementById('testSelect').addEventListener('change', function() {
+      showAnalytics(this.value);
+    });
+
+    // Initialize
+    loadTests();
+  </script>
+</body>
+</html>

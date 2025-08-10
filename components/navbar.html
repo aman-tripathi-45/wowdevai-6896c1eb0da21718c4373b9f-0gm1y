@@ -1,0 +1,32 @@
+<nav class="fixed top-0 left-0 right-0 bg-white shadow-lg z-50" data-id="main-navbar">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <div class="flex items-center space-x-3" data-id="navbar-logo">
+        <i data-lucide="graduation-cap" class="w-8 h-8 text-indigo-600"></i>
+        <span class="text-xl font-bold text-gray-900">EduTest Pro</span>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8" data-id="desktop-nav">
+        <a href="index.html" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium" data-id="nav-home">Home</a>
+        <a href="about.html" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium" data-id="nav-about">About</a>
+        <a href="contact.html" class="text-gray-700 hover:text-indigo-600 transition-colors font-medium" data-id="nav-contact">Contact</a>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden p-2" id="mobile-menu-btn" data-id="mobile-menu-btn">
+        <i data-lucide="menu" class="w-6 h-6 text-gray-700"></i>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div class="md:hidden hidden" id="mobile-nav" data-id="mobile-nav">
+      <div class="py-4 space-y-2">
+        <a href="index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium" data-id="mobile-nav-home">Home</a>
+        <a href="about.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium" data-id="mobile-nav-about">About</a>
+        <a href="contact.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium" data-id="mobile-nav-contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>
